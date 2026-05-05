@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dr. QK Hall – Futsal Auction 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Ops+One&family=Barlow+Condensed:wght@800;900&family=Teko:wght@600;700&family=Oswald:wght@700&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .banner {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 30% 40%, #0d3d3a 0%, #071e1c 45%, #020d0c 100%);
+  }
+
+  /* ── Background texture layers ── */
+  .bg-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridDrift 20s linear infinite;
+  }
+  @keyframes gridDrift { to { background-position: 60px 60px; } }
+
+  .bg-noise {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+    opacity: .35;
+    pointer-events: none;
+  }
+
+  /* ── Wave lines (bottom-left) ── */
+  .waves {
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 55%; height: 70%;
+    opacity: .18;
+  }
+  .waves svg { width: 100%; height: 100%; }
+
+  /* ── Confetti ── */
+  .confetti-wrap {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .confetti-wrap span {
+    position: absolute;
+    top: -20px;
+    width: 10px; height: 16px;
+    border-radius: 2px;
+    opacity: 0;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(0) rotate(0deg);   opacity: .9; }
+    80%  { opacity: .7; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ── Glow blobs ── */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+  }
+  .blob-teal  { width: 45vw; height: 45vw; background: rgba(20,120,100,.28); top: -10%; left: -5%; }
+  .blob-gold  { width: 30vw; height: 30vw; background: rgba(200,150,0,.18); top: 5%; right: 5%; }
+  .blob-dark  { width: 50vw; height: 50vw; background: rgba(5,30,28,.6);    bottom: -15%; left: 15%; }
+
+  /* ── Content wrapper ── */
+  .content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    width: 90%;
+    max-width: 1400px;
+    padding: 0 2vw;
+  }
+
+  /* ── Tournament title ── */
+  .tournament-title {
+    animation: titleIn .8s cubic-bezier(.22,1,.36,1) both;
+    margin-bottom: .35em;
+    line-height: 1;
+  }
+
+  .hall-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3.8rem, 10vw, 11rem);
+    line-height: .92;
+    letter-spacing: .08em;
+    display: block;
+    position: relative;
+    text-transform: uppercase;
+
+    /* Gold / amber trophy gradient */
+    background: linear-gradient(
+      180deg,
+      #fff5cc  0%,
+      #ffd700  18%,
+      #f5a800  36%,
+      #ffcc00  52%,
+      #c87000  68%,
+      #f5a800  82%,
+      #ffe566  100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    filter:
+      drop-shadow(0 0 22px rgba(245,167,0,.65))
+      drop-shadow(0 0 55px rgba(245,167,0,.3))
+      drop-shadow(4px 6px 0px rgba(0,0,0,.85));
+  }
+
+  .sub-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 3.4vw, 3.8rem);
+    line-height: 1.2;
+    color: rgba(255,255,255,.82);
+    letter-spacing: .18em;
+    display: block;
+    text-shadow:
+      0 0 14px rgba(255,255,255,.25),
+      1px 2px 0 rgba(0,0,0,.6);
+    margin-top: .15em;
+  }
+  @keyframes titleIn {
+    from { opacity: 0; transform: translateY(-40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── AUCTION ── */
+  .auction-word {
+    font-family: 'Black Ops One', cursive;
+    font-size: clamp(5rem, 18vw, 20rem);
+    line-height: .88;
+    display: block;
+    color: #fff;
+    letter-spacing: -.01em;
+    text-shadow:
+      0 0 0 #fff,
+      4px 4px 0 #aaa,
+      8px 8px 0 #777,
+      12px 12px 0 #444,
+      0 0 40px rgba(255,255,255,.15),
+      0 0 80px rgba(255,255,255,.08);
+    -webkit-text-stroke: 2px rgba(255,255,255,.4);
+    animation: auctionIn 1s .3s cubic-bezier(.22,1,.36,1) both;
+    position: relative;
+  }
+  @keyframes auctionIn {
+    from { opacity: 0; transform: scale(.7) translateY(30px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* cracked / aged overlay on AUCTION text */
+  .auction-word::after {
+    content: 'AUCTION';
+    position: absolute; inset: 0;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,.08);
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 3px,
+      rgba(255,255,255,.04) 3px,
+      rgba(255,255,255,.04) 4px
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    pointer-events: none;
+  }
+
+  /* ── Time line ── */
+  .time-line {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(1.4rem, 3.8vw, 4.2rem);
+    letter-spacing: .25em;
+    color: #e8e8e8;
+    text-shadow: 0 2px 20px rgba(0,0,0,.8), 0 0 30px rgba(255,255,255,.1);
+    margin-top: .3em;
+    animation: fadeUp .7s .8s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Divider lines ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1.5vw;
+    justify-content: center;
+    margin: .6em 0;
+    animation: fadeUp .7s .6s ease both;
+  }
+  .divider-line {
+    flex: 1; max-width: 220px; height: 2px;
+    background: linear-gradient(90deg, transparent, #f5c518, transparent);
+  }
+  .divider-diamond {
+    width: 8px; height: 8px;
+    background: #f5c518;
+    transform: rotate(45deg);
+    box-shadow: 0 0 12px #f5c518;
+  }
+
+  /* ── Soccer ball (right side) ── */
+  .ball-wrap {
+    position: absolute;
+    right: -10vw;
+    bottom: -8vh;
+    width: clamp(200px, 26vw, 400px);
+    height: clamp(200px, 26vw, 400px);
+    animation: ballIn 1.2s .4s cubic-bezier(.22,1,.36,1) both, ballFloat 4s 1.6s ease-in-out infinite;
+    z-index: 8;
+    opacity: .75;
+  }
+  @keyframes ballIn {
+    from { opacity: 0; transform: translate(40%, 40%) scale(.5) rotate(-30deg); }
+    to   { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+  }
+  @keyframes ballFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%       { transform: translateY(-18px) rotate(6deg); }
+  }
+
+  /* ── Spotlight sweep ── */
+  .spotlight {
+    position: absolute; inset: 0;
+    background: conic-gradient(from 200deg at 70% 30%, transparent 0deg, rgba(255,255,255,.04) 20deg, transparent 40deg);
+    animation: sweep 6s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes sweep {
+    from { transform: rotate(-8deg); }
+    to   { transform: rotate(8deg); }
+  }
+
+  /* ── Pulse ring behind AUCTION ── */
+  .pulse-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60vw; height: 30vh;
+    border-radius: 50%;
+    border: 2px solid rgba(245,197,24,.12);
+    animation: pulse 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 5;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%,-50%) scale(1);   opacity: .5; }
+    50%       { transform: translate(-50%,-50%) scale(1.08); opacity: .15; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="banner">
+
+  <!-- Atmosphere layers -->
+  <div class="bg-grid"></div>
+  <div class="bg-noise"></div>
+  <div class="blob blob-teal"></div>
+  <div class="blob blob-gold"></div>
+  <div class="blob blob-dark"></div>
+  <div class="spotlight"></div>
+  <div class="pulse-ring"></div>
+
+  <!-- Wave SVG (bottom-left) -->
+  <div class="waves">
+    <svg viewBox="0 0 600 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-50 400 Q150 300 300 380 T650 320" stroke="#1affe0" stroke-width="1.5" fill="none" opacity=".6"/>
+      <path d="M-50 430 Q170 330 330 400 T680 350" stroke="#1affe0" stroke-width="1"   fill="none" opacity=".4"/>
+      <path d="M-50 460 Q200 360 360 430 T710 380" stroke="#1affe0" stroke-width="1"   fill="none" opacity=".3"/>
+      <path d="M-50 490 Q230 390 390 460 T740 410" stroke="#1affe0" stroke-width=".8"  fill="none" opacity=".2"/>
+      <path d="M-50 510 Q260 410 420 490 T770 440" stroke="#1affe0" stroke-width=".6"  fill="none" opacity=".15"/>
+    </svg>
+  </div>
+
+  <!-- Confetti -->
+  <div class="confetti-wrap" id="confetti"></div>
+
+  <!-- Futsal ball -->
+  <div class="ball-wrap">
+    <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Main sphere gradient: light top-left, dark bottom-right -->
+        <radialGradient id="bg" cx="36%" cy="30%" r="65%">
+          <stop offset="0%"   stop-color="#ffffff"/>
+          <stop offset="30%"  stop-color="#e8e8e8"/>
+          <stop offset="70%"  stop-color="#b0b0b0"/>
+          <stop offset="100%" stop-color="#606060"/>
+        </radialGradient>
+        <!-- Panel fill gradient -->
+        <radialGradient id="pg" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stop-color="#1a1a2e"/>
+          <stop offset="100%" stop-color="#0a0a14"/>
+        </radialGradient>
+        <!-- Shine -->
+        <radialGradient id="sh" cx="28%" cy="22%" r="40%">
+          <stop offset="0%"   stop-color="rgba(255,255,255,.95)"/>
+          <stop offset="60%"  stop-color="rgba(255,255,255,.25)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+        </radialGradient>
+        <!-- Shadow under ball -->
+        <radialGradient id="shadow" cx="50%" cy="50%">
+          <stop offset="0%"   stop-color="rgba(0,0,0,.55)"/>
+          <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+        </radialGradient>
+        <clipPath id="bc">
+          <circle cx="110" cy="110" r="100"/>
+        </clipPath>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Drop shadow -->
+      <ellipse cx="110" cy="215" rx="72" ry="10" fill="url(#shadow)" opacity=".5"/>
+
+      <!-- Base sphere -->
+      <circle cx="110" cy="110" r="100" fill="url(#bg)" filter="drop-shadow(0 8px 28px rgba(0,0,0,.7))"/>
+
+      <!-- ── Futsal / Tsukahara-style panels ── -->
+      <!-- Futsal ball has rounded rectangular panels (Tsukahara pattern):
+           1 center pentagon + surrounding rectangles + side panels -->
+      <g clip-path="url(#bc)">
+
+        <!-- Centre pentagon (top) -->
+        <polygon
+          points="110,18  136,36  126,66  94,66  84,36"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+
+        <!-- Upper-right panel -->
+        <polygon
+          points="136,36  168,52  162,86  126,66"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+
+        <!-- Right panel -->
+        <polygon
+          points="168,52  194,80  188,116  162,86"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+
+        <!-- Lower-right panel -->
+        <polygon
+          points="188,116  178,150  148,160  138,126  162,86"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+
+        <!-- Upper-left panel -->
+        <polygon
+          points="84,36  94,66  58,86  52,52"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+
+        <!-- Left panel -->
+        <polygon
+          points="52,52  58,86  32,116  26,80"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+
+        <!-- Lower-left panel -->
+        <polygon
+          points="32,116  58,86  82,126  72,160  42,150"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+
+        <!-- Centre wide panel (equator) -->
+        <polygon
+          points="94,66  126,66  138,96  110,108  82,96"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+
+        <!-- Right-mid panel -->
+        <polygon
+          points="126,66  162,86  162,116  138,126  138,96"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+
+        <!-- Left-mid panel -->
+        <polygon
+          points="94,66  82,96  82,126  58,116  58,86"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+
+        <!-- Centre bottom panel -->
+        <polygon
+          points="82,126  110,108  138,126  128,158  92,158"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+
+        <!-- Lower panel -->
+        <polygon
+          points="92,158  128,158  138,188  110,200  82,188"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+
+        <!-- Bottom-right panel -->
+        <polygon
+          points="128,158  148,160  178,180  148,202  138,188"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+
+        <!-- Bottom-left panel -->
+        <polygon
+          points="92,158  82,188  72,200  42,180  72,160"
+          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+
+        <!-- Panel seam white highlight lines -->
+        <line x1="110" y1="18"  x2="110" y2="108" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+        <line x1="26"  y1="80"  x2="194" y2="80"  stroke="rgba(255,255,255,.10)" stroke-width="1"/>
+
+      </g>
+
+      <!-- Shine highlight -->
+      <ellipse cx="82" cy="72" rx="28" ry="18" fill="url(#sh)" opacity=".7" transform="rotate(-25,82,72)"/>
+      <!-- Small secondary shine -->
+      <ellipse cx="68" cy="60" rx="10" ry="6"  fill="rgba(255,255,255,.5)" transform="rotate(-25,68,60)"/>
+    </svg>
+  </div>
+
+  <!-- Main content -->
+  <div class="content">
+
+    <div class="tournament-title">
+      <span class="hall-name">Dr. QK Hall</span>
+      <span class="sub-title">Intra-Hall Futsal · Tournament-2026</span>
+    </div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-diamond"></div>
+      <div class="divider-line"></div>
+    </div>
+
+    <span class="auction-word">AUCTION</span>
+
+    <div class="divider" style="margin-top:.4em">
+      <div class="divider-line"></div>
+      <div class="divider-diamond"></div>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="time-line">TODAY AT 11:00 PM</div>
+
+  </div>
+</div>
+
+<script>
+  // Generate confetti pieces
+  const wrap = document.getElementById('confetti');
+  const colors = ['#f5c518','#fff','#1affe0','#ffd700','#c0c0c0','#4ecdc4'];
+  for (let i = 0; i < 55; i++) {
+    const el = document.createElement('span');
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    el.style.cssText = `
+      left: ${Math.random() * 100}%;
+      width: ${6 + Math.random() * 10}px;
+      height: ${10 + Math.random() * 14}px;
+      background: ${color};
+      border-radius: ${Math.random() > .5 ? '50%' : '2px'};
+      animation-duration: ${4 + Math.random() * 7}s;
+      animation-delay: ${Math.random() * 8}s;
+      opacity: 0;
+      transform: rotate(${Math.random() * 360}deg);
+    `;
+    wrap.appendChild(el);
+  }
+</script>
+
+</body>
+</html>
