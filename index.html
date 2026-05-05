@@ -57,24 +57,11 @@
     opacity: .18; pointer-events: none;
   }
 
-  /* ── DOM-based confetti: works on ALL browsers including TV ── */
-  #confetti-wrap {
+  /* Canvas confetti — drawn by JS, works on all browsers including TV */
+  #confetti-canvas {
     position: absolute; inset: 0;
     width: 1920px; height: 1080px;
     pointer-events: none; z-index: 9;
-    overflow: hidden;
-  }
-
-  .cp {
-    position: absolute;
-    top: -20px;
-    will-change: transform;
-    animation: fall linear infinite;
-  }
-
-  @keyframes fall {
-    0%   { transform: translateY(0px) rotate(0deg); opacity: .9; }
-    100% { transform: translateY(1120px) rotate(720deg); opacity: .4; }
   }
 
   .spotlight {
@@ -158,22 +145,18 @@
   .auction-word {
     font-family: 'Black Ops One', cursive;
     font-size: 310px; line-height: .85; display: block;
-    color: #fff; letter-spacing: -.01em;
-    text-shadow: 4px 4px 0 #aaa, 8px 8px 0 #777, 14px 14px 0 #444,
-      0 0 50px rgba(255,255,255,.15), 0 0 100px rgba(255,255,255,.07);
-    -webkit-text-stroke: 2px rgba(255,255,255,.35);
+    color: #ffffff; letter-spacing: -.01em;
+    text-shadow:
+      0 0 30px rgba(255,255,255,.9),
+      0 0 80px rgba(255,255,255,.5),
+      0 0 160px rgba(255,255,255,.2);
+    -webkit-text-stroke: 1.5px rgba(255,255,255,.5);
+    paint-order: stroke fill;
     animation: auctionIn 1s .3s cubic-bezier(.22,1,.36,1) both;
-    position: relative;
   }
   @keyframes auctionIn {
     from { opacity: 0; transform: scale(.7) translateY(30px); }
     to   { opacity: 1; transform: scale(1) translateY(0); }
-  }
-  .auction-word::after {
-    content: 'AUCTION'; position: absolute; inset: 0; color: transparent;
-    -webkit-text-stroke: 1px rgba(255,255,255,.06);
-    background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(255,255,255,.04) 3px, rgba(255,255,255,.04) 4px);
-    -webkit-background-clip: text; background-clip: text; pointer-events: none;
   }
 
   .time-line {
@@ -210,8 +193,8 @@
       </svg>
     </div>
 
-    <!-- DOM confetti: pure CSS animation, works on all TV browsers -->
-    <div id="confetti-wrap"></div>
+    <!-- Canvas confetti: drawn via requestAnimationFrame, works on TV browsers -->
+    <canvas id="confetti-canvas" width="1920" height="1080"></canvas>
 
     <div class="ball-wrap">
       <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
@@ -282,13 +265,12 @@
 </div>
 
 <script>
-  // ── FIX 1: Scale to fully fit screen (no 0.75 crop) ──────────────
+  // ── Scale to 75% of screen ──────────────────────────────────────────
   function scaleToFit() {
     var el     = document.getElementById('scaleRoot');
     var scaleX = window.innerWidth  / 1920;
     var scaleY = window.innerHeight / 1080;
-    // Use the smaller axis so nothing is ever cut off
-    var scale  = Math.min(scaleX, scaleY);
+    var scale  = Math.min(scaleX, scaleY) * 0.9375; // 75% * 1.25 = 93.75%
     el.style.transform = 'scale(' + scale + ')';
     el.style.left = ((window.innerWidth  - 1920 * scale) / 2) + 'px';
     el.style.top  = ((window.innerHeight - 1080 * scale) / 2) + 'px';
@@ -296,61 +278,71 @@
   scaleToFit();
   window.addEventListener('resize', scaleToFit);
 
-  // ── FIX 2: DOM-based confetti — no canvas, works on all TV browsers ──
-  var COLORS = ['#f5c518','#ffffff','#1affe0','#ffd700','#c0c0c0','#ff6b6b','#4ecdc4','#ffe066'];
-  var wrap   = document.getElementById('confetti-wrap');
+  // ── Canvas confetti (requestAnimationFrame — works on TV browsers) ──
+  var canvas = document.getElementById('confetti-canvas');
+  var ctx    = canvas.getContext('2d');
   var W = 1920, H = 1080;
 
-  for (var i = 0; i < 90; i++) {
-    var el       = document.createElement('div');
-    var isCircle = Math.random() > 0.55;
-    var w        = Math.round(8  + Math.random() * 12);
-    var h        = Math.round(12 + Math.random() * 16);
-    var color    = COLORS[Math.floor(Math.random() * COLORS.length)];
-    var duration = (4 + Math.random() * 7).toFixed(2);   // 4–11 s fall
-    var delay    = -(Math.random() * 11).toFixed(2);      // negative = already mid-air at load
-    var xStart   = Math.round(Math.random() * W);
-    var xDrift   = Math.round((Math.random() - 0.5) * 180); // horizontal sway
+  var COLORS = ['#f5c518','#ffffff','#1affe0','#ffd700','#c0c0c0','#ff6b6b','#4ecdc4','#ffe066'];
 
-    el.className = 'cp';
-    el.style.cssText = [
-      'left:'             + xStart  + 'px',
-      'width:'            + w       + 'px',
-      'height:'           + h       + 'px',
-      'background:'       + color,
-      'border-radius:'    + (isCircle ? '50%' : '3px'),
-      'animation-duration:'        + duration + 's',
-      'animation-delay:'           + delay    + 's',
-      /* unique horizontal sway via translate offset baked into keyframe via CSS var */
-      '--drift:'          + xDrift  + 'px',
-      'opacity: 0.88'
-    ].join(';');
-
-    // Each piece gets its own inline @keyframes-like x-drift via JS transform update
-    // We achieve the wobble by offsetting the left position each cycle via JS—
-    // but for pure CSS on TV we simply stagger with varied delays (already done above).
-
-    wrap.appendChild(el);
+  // Build pieces
+  var pieces = [];
+  for (var i = 0; i < 80; i++) {
+    pieces.push({
+      x:      Math.random() * W,
+      y:      Math.random() * H - H,        // start scattered above viewport
+      w:      8  + Math.random() * 12,
+      h:      12 + Math.random() * 16,
+      color:  COLORS[Math.floor(Math.random() * COLORS.length)],
+      speed:  1.2 + Math.random() * 2.8,    // px per frame
+      angle:  Math.random() * Math.PI * 2,
+      spin:   (Math.random() - 0.5) * 0.12,
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: 0.04 + Math.random() * 0.04,
+      isCircle: Math.random() > 0.55
+    });
   }
 
-  // Add a tiny stylesheet for x-drift per piece (TV-safe: no rAF needed)
-  // We do it in JS so each piece can have a unique horizontal travel
-  var styleEl = document.createElement('style');
-  var rules   = '';
-  var pieces  = wrap.querySelectorAll('.cp');
-  for (var j = 0; j < pieces.length; j++) {
-    var drift = parseInt(pieces[j].style.getPropertyValue('--drift')) || 0;
-    var cls   = 'cp-' + j;
-    pieces[j].classList.add(cls);
-    rules += '.' + cls + '{animation-name: fall' + j + ';}';
-    rules += '@keyframes fall' + j + '{';
-    rules += '0%{transform:translateX(0px) rotate(0deg);opacity:.9;}';
-    rules += '50%{transform:translateX(' + (drift/2) + 'px) rotate(360deg);opacity:.85;}';
-    rules += '100%{transform:translateX(' + drift + 'px) rotate(720deg);opacity:.4;}';
-    rules += '}';
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+
+    for (var i = 0; i < pieces.length; i++) {
+      var p = pieces[i];
+
+      // Update position
+      p.y      += p.speed;
+      p.angle  += p.spin;
+      p.wobble += p.wobbleSpeed;
+      p.x      += Math.sin(p.wobble) * 1.2;   // gentle side sway
+
+      // Reset when off bottom
+      if (p.y > H + 20) {
+        p.x = Math.random() * W;
+        p.y = -20;
+      }
+
+      // Draw
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.globalAlpha = 0.88;
+      ctx.fillStyle = p.color;
+
+      if (p.isCircle) {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.w / 2, p.h / 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      }
+
+      ctx.restore();
+    }
+
+    requestAnimationFrame(drawFrame);
   }
-  styleEl.textContent = rules;
-  document.head.appendChild(styleEl);
+
+  drawFrame();
 </script>
 </body>
 </html>
