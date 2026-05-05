@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1920">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dr. QK Hall – Futsal Auction 2026</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Ops+One&family=Barlow+Condensed:wght@800;900&family=Oswald:wght@700&display=swap');
@@ -10,10 +10,23 @@
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   html, body {
-    width: 1920px;
-    height: 1080px;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     background: #000;
+  }
+
+  /* 
+    Scale trick: design at 1920×1080, then scale down by 0.5.
+    The wrapper is 1920×1080 but transform-scaled to fit the viewport.
+    This gives crisp 1:1 rendering on any DPR.
+  */
+  .scale-root {
+    position: fixed;
+    top: 0; left: 0;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: top left;
   }
 
   .banner {
@@ -148,8 +161,7 @@
 
   .divider {
     display: flex; align-items: center; gap: 24px;
-    justify-content: center;
-    margin: 18px 0;
+    justify-content: center; margin: 18px 0;
     animation: fadeUp .7s .6s ease both;
   }
   .divider-line { flex: 1; max-width: 320px; height: 2px; background: linear-gradient(90deg, transparent, #f5c518, transparent); }
@@ -162,7 +174,8 @@
     display: block;
     color: #fff;
     letter-spacing: -.01em;
-    text-shadow: 4px 4px 0 #aaa, 8px 8px 0 #777, 14px 14px 0 #444, 0 0 50px rgba(255,255,255,.15), 0 0 100px rgba(255,255,255,.07);
+    text-shadow: 4px 4px 0 #aaa, 8px 8px 0 #777, 14px 14px 0 #444,
+      0 0 50px rgba(255,255,255,.15), 0 0 100px rgba(255,255,255,.07);
     -webkit-text-stroke: 2px rgba(255,255,255,.35);
     animation: auctionIn 1s .3s cubic-bezier(.22,1,.36,1) both;
     position: relative;
@@ -172,14 +185,11 @@
     to   { opacity: 1; transform: scale(1) translateY(0); }
   }
   .auction-word::after {
-    content: 'AUCTION';
-    position: absolute; inset: 0;
+    content: 'AUCTION'; position: absolute; inset: 0;
     color: transparent;
     -webkit-text-stroke: 1px rgba(255,255,255,.06);
     background: repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(255,255,255,.04) 3px, rgba(255,255,255,.04) 4px);
-    -webkit-background-clip: text;
-    background-clip: text;
-    pointer-events: none;
+    -webkit-background-clip: text; background-clip: text; pointer-events: none;
   }
 
   .time-line {
@@ -199,99 +209,112 @@
 </head>
 <body>
 
-<div class="banner">
-  <div class="bg-grid"></div>
-  <div class="bg-noise"></div>
-  <div class="blob blob-teal"></div>
-  <div class="blob blob-gold"></div>
-  <div class="blob blob-dark"></div>
-  <div class="spotlight"></div>
-  <div class="pulse-ring"></div>
+<div class="scale-root" id="scaleRoot">
+  <div class="banner">
+    <div class="bg-grid"></div>
+    <div class="bg-noise"></div>
+    <div class="blob blob-teal"></div>
+    <div class="blob blob-gold"></div>
+    <div class="blob blob-dark"></div>
+    <div class="spotlight"></div>
+    <div class="pulse-ring"></div>
 
-  <div class="waves">
-    <svg viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M-80 560 Q200 420 450 530 T980 460" stroke="#1affe0" stroke-width="2"   fill="none" opacity=".6"/>
-      <path d="M-80 600 Q230 460 480 570 T1010 500" stroke="#1affe0" stroke-width="1.4" fill="none" opacity=".4"/>
-      <path d="M-80 640 Q260 500 510 610 T1040 540" stroke="#1affe0" stroke-width="1.2" fill="none" opacity=".3"/>
-      <path d="M-80 680 Q290 540 540 650 T1070 580" stroke="#1affe0" stroke-width="1"   fill="none" opacity=".2"/>
-      <path d="M-80 710 Q320 570 570 680 T1100 610" stroke="#1affe0" stroke-width=".7"  fill="none" opacity=".14"/>
-    </svg>
-  </div>
-
-  <div class="confetti-wrap" id="confetti"></div>
-
-  <div class="ball-wrap">
-    <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="bg" cx="36%" cy="30%" r="65%">
-          <stop offset="0%"   stop-color="#ffffff"/>
-          <stop offset="30%"  stop-color="#e8e8e8"/>
-          <stop offset="70%"  stop-color="#b0b0b0"/>
-          <stop offset="100%" stop-color="#606060"/>
-        </radialGradient>
-        <radialGradient id="pg" cx="50%" cy="50%" r="50%">
-          <stop offset="0%"   stop-color="#1a1a2e"/>
-          <stop offset="100%" stop-color="#0a0a14"/>
-        </radialGradient>
-        <radialGradient id="sh" cx="28%" cy="22%" r="40%">
-          <stop offset="0%"   stop-color="rgba(255,255,255,.95)"/>
-          <stop offset="60%"  stop-color="rgba(255,255,255,.25)"/>
-          <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-        </radialGradient>
-        <radialGradient id="shadow" cx="50%" cy="50%">
-          <stop offset="0%"   stop-color="rgba(0,0,0,.55)"/>
-          <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
-        </radialGradient>
-        <clipPath id="bc"><circle cx="110" cy="110" r="100"/></clipPath>
-      </defs>
-      <ellipse cx="110" cy="215" rx="72" ry="10" fill="url(#shadow)" opacity=".5"/>
-      <circle cx="110" cy="110" r="100" fill="url(#bg)" filter="drop-shadow(0 8px 28px rgba(0,0,0,.7))"/>
-      <g clip-path="url(#bc)">
-        <polygon points="110,18 136,36 126,66 94,66 84,36"           fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
-        <polygon points="136,36 168,52 162,86 126,66"                fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
-        <polygon points="168,52 194,80 188,116 162,86"               fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
-        <polygon points="188,116 178,150 148,160 138,126 162,86"     fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
-        <polygon points="84,36 94,66 58,86 52,52"                    fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
-        <polygon points="52,52 58,86 32,116 26,80"                   fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
-        <polygon points="32,116 58,86 82,126 72,160 42,150"          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
-        <polygon points="94,66 126,66 138,96 110,108 82,96"          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
-        <polygon points="126,66 162,86 162,116 138,126 138,96"       fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
-        <polygon points="94,66 82,96 82,126 58,116 58,86"            fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
-        <polygon points="82,126 110,108 138,126 128,158 92,158"      fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
-        <polygon points="92,158 128,158 138,188 110,200 82,188"      fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
-        <polygon points="128,158 148,160 178,180 148,202 138,188"    fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
-        <polygon points="92,158 82,188 72,200 42,180 72,160"         fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
-      </g>
-      <ellipse cx="82" cy="72" rx="28" ry="18" fill="url(#sh)" opacity=".7" transform="rotate(-25,82,72)"/>
-      <ellipse cx="68" cy="60" rx="10" ry="6"  fill="rgba(255,255,255,.5)" transform="rotate(-25,68,60)"/>
-    </svg>
-  </div>
-
-  <div class="content">
-    <div class="tournament-title">
-      <span class="hall-name">Dr. QK Hall</span>
-      <span class="sub-title">Intra-Hall Futsal · Tournament-2026</span>
+    <div class="waves">
+      <svg viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M-80 560 Q200 420 450 530 T980 460"   stroke="#1affe0" stroke-width="2"   fill="none" opacity=".6"/>
+        <path d="M-80 600 Q230 460 480 570 T1010 500"  stroke="#1affe0" stroke-width="1.4" fill="none" opacity=".4"/>
+        <path d="M-80 640 Q260 500 510 610 T1040 540"  stroke="#1affe0" stroke-width="1.2" fill="none" opacity=".3"/>
+        <path d="M-80 680 Q290 540 540 650 T1070 580"  stroke="#1affe0" stroke-width="1"   fill="none" opacity=".2"/>
+        <path d="M-80 710 Q320 570 570 680 T1100 610"  stroke="#1affe0" stroke-width=".7"  fill="none" opacity=".14"/>
+      </svg>
     </div>
 
-    <div class="divider">
-      <div class="divider-line"></div>
-      <div class="divider-diamond"></div>
-      <div class="divider-line"></div>
+    <div class="confetti-wrap" id="confetti"></div>
+
+    <div class="ball-wrap">
+      <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bg" cx="36%" cy="30%" r="65%">
+            <stop offset="0%"   stop-color="#ffffff"/>
+            <stop offset="30%"  stop-color="#e8e8e8"/>
+            <stop offset="70%"  stop-color="#b0b0b0"/>
+            <stop offset="100%" stop-color="#606060"/>
+          </radialGradient>
+          <radialGradient id="pg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#1a1a2e"/>
+            <stop offset="100%" stop-color="#0a0a14"/>
+          </radialGradient>
+          <radialGradient id="sh" cx="28%" cy="22%" r="40%">
+            <stop offset="0%"   stop-color="rgba(255,255,255,.95)"/>
+            <stop offset="60%"  stop-color="rgba(255,255,255,.25)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+          <radialGradient id="shadow" cx="50%" cy="50%">
+            <stop offset="0%"   stop-color="rgba(0,0,0,.55)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+          </radialGradient>
+          <clipPath id="bc"><circle cx="110" cy="110" r="100"/></clipPath>
+        </defs>
+        <ellipse cx="110" cy="215" rx="72" ry="10" fill="url(#shadow)" opacity=".5"/>
+        <circle cx="110" cy="110" r="100" fill="url(#bg)" filter="drop-shadow(0 8px 28px rgba(0,0,0,.7))"/>
+        <g clip-path="url(#bc)">
+          <polygon points="110,18 136,36 126,66 94,66 84,36"           fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="136,36 168,52 162,86 126,66"                fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="168,52 194,80 188,116 162,86"               fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="188,116 178,150 148,160 138,126 162,86"     fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="84,36 94,66 58,86 52,52"                    fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="52,52 58,86 32,116 26,80"                   fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="32,116 58,86 82,126 72,160 42,150"          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="94,66 126,66 138,96 110,108 82,96"          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="126,66 162,86 162,116 138,126 138,96"       fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="94,66 82,96 82,126 58,116 58,86"            fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="82,126 110,108 138,126 128,158 92,158"      fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="92,158 128,158 138,188 110,200 82,188"      fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="128,158 148,160 178,180 148,202 138,188"    fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="92,158 82,188 72,200 42,180 72,160"         fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+        </g>
+        <ellipse cx="82" cy="72" rx="28" ry="18" fill="url(#sh)" opacity=".7" transform="rotate(-25,82,72)"/>
+        <ellipse cx="68" cy="60" rx="10" ry="6"  fill="rgba(255,255,255,.5)" transform="rotate(-25,68,60)"/>
+      </svg>
     </div>
 
-    <span class="auction-word">AUCTION</span>
-
-    <div class="divider" style="margin-top:14px">
-      <div class="divider-line"></div>
-      <div class="divider-diamond"></div>
-      <div class="divider-line"></div>
+    <div class="content">
+      <div class="tournament-title">
+        <span class="hall-name">Dr. QK Hall</span>
+        <span class="sub-title">Intra-Hall Futsal · Tournament-2026</span>
+      </div>
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-diamond"></div>
+        <div class="divider-line"></div>
+      </div>
+      <span class="auction-word">AUCTION</span>
+      <div class="divider" style="margin-top:14px">
+        <div class="divider-line"></div>
+        <div class="divider-diamond"></div>
+        <div class="divider-line"></div>
+      </div>
+      <div class="time-line">TODAY AT 11:00 PM</div>
     </div>
-
-    <div class="time-line">TODAY AT 11:00 PM</div>
   </div>
 </div>
 
 <script>
+  // Auto-scale the 1920×1080 canvas to fit any screen/window perfectly
+  function scaleToFit() {
+    const el = document.getElementById('scaleRoot');
+    const scaleX = window.innerWidth  / 1920;
+    const scaleY = window.innerHeight / 1080;
+    const scale  = Math.min(scaleX, scaleY);
+    el.style.transform = `scale(${scale})`;
+    // Centre if letterboxed
+    el.style.left = ((window.innerWidth  - 1920 * scale) / 2) + 'px';
+    el.style.top  = ((window.innerHeight - 1080 * scale) / 2) + 'px';
+  }
+  scaleToFit();
+  window.addEventListener('resize', scaleToFit);
+
+  // Confetti
   const wrap = document.getElementById('confetti');
   const colors = ['#f5c518','#fff','#1affe0','#ffd700','#c0c0c0','#4ecdc4'];
   for (let i = 0; i < 55; i++) {
