@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Dr. QK Hall – Futsal Auction 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Ops+One&family=Barlow+Condensed:wght@800;900&family=Oswald:wght@700&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden; background: #000;
+  }
+
+  .scale-root {
+    position: fixed;
+    top: 0; left: 0;
+    width: 1920px; height: 1080px;
+    transform-origin: top left;
+  }
+
+  .banner {
+    position: relative;
+    width: 1920px; height: 1080px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 30% 40%, #0d3d3a 0%, #071e1c 45%, #020d0c 100%);
+  }
+
+  .bg-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 64px 64px;
+    animation: gridDrift 20s linear infinite;
+  }
+  @keyframes gridDrift { to { background-position: 64px 64px; } }
+
+  .bg-noise {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+    opacity: .3; pointer-events: none;
+  }
+
+  .blob { position: absolute; border-radius: 50%; filter: blur(120px); pointer-events: none; }
+  .blob-teal { width: 860px; height: 860px; background: rgba(20,120,100,.28); top: -180px; left: -100px; }
+  .blob-gold { width: 580px; height: 580px; background: rgba(200,150,0,.18); top: 60px; right: 80px; }
+  .blob-dark { width: 960px; height: 960px; background: rgba(5,30,28,.6); bottom: -280px; left: 280px; }
+
+  .waves {
+    position: absolute; bottom: -80px; left: -80px;
+    width: 900px; height: 700px;
+    opacity: .18; pointer-events: none;
+  }
+
+  #confetti-canvas {
+    position: absolute; inset: 0;
+    width: 1920px; height: 1080px;
+    pointer-events: none; z-index: 9;
+  }
+
+  .spotlight {
+    position: absolute; inset: 0;
+    background: conic-gradient(from 200deg at 70% 30%, transparent 0deg, rgba(255,255,255,.04) 20deg, transparent 40deg);
+    animation: sweep 6s ease-in-out infinite alternate; pointer-events: none;
+  }
+  @keyframes sweep { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
+
+  .pulse-ring {
+    position: absolute; top: 540px; left: 960px;
+    transform: translate(-50%,-50%);
+    width: 1100px; height: 340px; border-radius: 50%;
+    border: 2px solid rgba(245,197,24,.12);
+    animation: pulse 3s ease-in-out infinite;
+    pointer-events: none; z-index: 5;
+  }
+  @keyframes pulse {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity: .5; }
+    50%      { transform: translate(-50%,-50%) scale(1.08); opacity: .15; }
+  }
+
+  .ball-wrap {
+    position: absolute; right: -120px; bottom: -90px;
+    width: 480px; height: 480px;
+    animation: ballIn 1.2s .4s cubic-bezier(.22,1,.36,1) both, ballFloat 4s 1.6s ease-in-out infinite;
+    z-index: 8; opacity: .72;
+  }
+  @keyframes ballIn {
+    from { opacity: 0; transform: translate(40%,40%) scale(.5) rotate(-30deg); }
+    to   { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+  }
+  @keyframes ballFloat {
+    0%,100% { transform: translateY(0) rotate(0deg); }
+    50%     { transform: translateY(-22px) rotate(6deg); }
+  }
+
+  .content {
+    position: relative; z-index: 10;
+    text-align: center; width: 1440px;
+  }
+
+  .tournament-title {
+    animation: titleIn .8s cubic-bezier(.22,1,.36,1) both;
+    margin-bottom: 14px; line-height: 1;
+  }
+  @keyframes titleIn {
+    from { opacity: 0; transform: translateY(-40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hall-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 172px;
+    line-height: .9; letter-spacing: .07em;
+    display: block; text-transform: uppercase;
+    background: linear-gradient(180deg, #fff5cc 0%, #ffd700 18%, #f5a800 36%, #ffcc00 52%, #c87000 68%, #f5a800 82%, #ffe566 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    filter:
+      drop-shadow(0 0 24px rgba(245,167,0,.70))
+      drop-shadow(0 0 60px rgba(245,167,0,.32))
+      drop-shadow(5px 7px 0px rgba(0,0,0,.9));
+  }
+
+  .sub-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700; font-size: 52px; line-height: 1.15;
+    color: rgba(255,255,255,.82); letter-spacing: .18em; display: block;
+    text-shadow: 0 0 14px rgba(255,255,255,.25), 2px 3px 0 rgba(0,0,0,.7);
+    margin-top: 8px;
+  }
+
+  .divider {
+    display: flex; align-items: center; gap: 24px;
+    justify-content: center; margin: 18px 0;
+    animation: fadeUp .7s .6s ease both;
+  }
+  .divider-line { flex: 1; max-width: 320px; height: 2px; background: linear-gradient(90deg, transparent, #f5c518, transparent); }
+  .divider-diamond { width: 10px; height: 10px; background: #f5c518; transform: rotate(45deg); box-shadow: 0 0 14px #f5c518; }
+
+  .auction-word {
+    font-family: 'Black Ops One', cursive;
+    font-size: 310px; line-height: .85; display: block;
+    color: #ffffff; letter-spacing: -.01em;
+    text-shadow:
+      0 0 30px rgba(255,255,255,.9),
+      0 0 80px rgba(255,255,255,.5),
+      0 0 160px rgba(255,255,255,.2);
+    -webkit-text-stroke: 1.5px rgba(255,255,255,.5);
+    paint-order: stroke fill;
+    animation: auctionIn 1s .3s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes auctionIn {
+    from { opacity: 0; transform: scale(.7) translateY(30px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .time-line {
+    font-family: 'Bebas Neue', cursive; font-size: 72px; letter-spacing: .28em;
+    color: #e8e8e8;
+    text-shadow: 0 2px 20px rgba(0,0,0,.8), 0 0 30px rgba(255,255,255,.1);
+    margin-top: 10px; animation: fadeUp .7s .8s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── JOIN US Button ─────────────────────────────────────── */
+  .join-btn-wrap {
+    margin-top: 36px;
+    animation: fadeUp .7s 1.0s ease both;
+    position: relative; z-index: 20;
+  }
+
+  .join-btn {
+    display: inline-block;
+    font-family: 'Black Ops One', cursive;
+    font-size: 52px;
+    letter-spacing: .18em;
+    text-decoration: none;
+    color: #000;
+    padding: 22px 90px;
+    border-radius: 6px;
+    position: relative;
+    background: linear-gradient(135deg, #ffe566 0%, #f5c518 30%, #f5a800 60%, #ffd700 80%, #ffe566 100%);
+    box-shadow:
+      0 0 0 3px rgba(245,197,24,.6),
+      0 0 40px rgba(245,197,24,.55),
+      0 0 100px rgba(245,167,0,.28),
+      0 8px 32px rgba(0,0,0,.6);
+    transition: transform .18s cubic-bezier(.22,1,.36,1), box-shadow .18s ease, filter .18s ease;
+    overflow: hidden;
+  }
+
+  /* shimmer sweep */
+  .join-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -80%;
+    width: 60%; height: 100%;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.55) 50%, transparent 100%);
+    transform: skewX(-18deg);
+    animation: shimmer 2.8s 1.4s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%   { left: -80%; }
+    60%  { left: 130%; }
+    100% { left: 130%; }
+  }
+
+  /* pulse glow ring */
+  .join-btn::after {
+    content: '';
+    position: absolute; inset: -4px;
+    border-radius: 10px;
+    border: 2px solid rgba(245,197,24,.5);
+    animation: btnPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes btnPulse {
+    0%,100% { transform: scale(1); opacity: .7; }
+    50%     { transform: scale(1.04); opacity: .2; }
+  }
+
+  .join-btn:hover {
+    transform: scale(1.06) translateY(-3px);
+    filter: brightness(1.12);
+    box-shadow:
+      0 0 0 3px rgba(245,197,24,.9),
+      0 0 60px rgba(245,197,24,.8),
+      0 0 120px rgba(245,167,0,.45),
+      0 12px 40px rgba(0,0,0,.7);
+  }
+
+  .join-btn:active {
+    transform: scale(.98) translateY(0);
+  }
+
+  /* ── Music toggle button ─────────────────────────────────── */
+  .music-btn {
+    position: absolute;
+    bottom: 36px; right: 48px;
+    z-index: 20;
+    background: rgba(255,255,255,.08);
+    border: 1.5px solid rgba(245,197,24,.35);
+    border-radius: 50%;
+    width: 72px; height: 72px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, box-shadow .2s;
+    box-shadow: 0 0 20px rgba(245,197,24,.18);
+  }
+  .music-btn:hover {
+    background: rgba(245,197,24,.15);
+    box-shadow: 0 0 32px rgba(245,197,24,.4);
+  }
+  .music-btn svg { width: 32px; height: 32px; }
+</style>
+</head>
+<body>
+
+<div class="scale-root" id="scaleRoot">
+  <div class="banner">
+    <div class="bg-grid"></div>
+    <div class="bg-noise"></div>
+    <div class="blob blob-teal"></div>
+    <div class="blob blob-gold"></div>
+    <div class="blob blob-dark"></div>
+    <div class="spotlight"></div>
+    <div class="pulse-ring"></div>
+
+    <div class="waves">
+      <svg viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M-80 560 Q200 420 450 530 T980 460"  stroke="#1affe0" stroke-width="2"   fill="none" opacity=".6"/>
+        <path d="M-80 600 Q230 460 480 570 T1010 500" stroke="#1affe0" stroke-width="1.4" fill="none" opacity=".4"/>
+        <path d="M-80 640 Q260 500 510 610 T1040 540" stroke="#1affe0" stroke-width="1.2" fill="none" opacity=".3"/>
+        <path d="M-80 680 Q290 540 540 650 T1070 580" stroke="#1affe0" stroke-width="1"   fill="none" opacity=".2"/>
+        <path d="M-80 710 Q320 570 570 680 T1100 610" stroke="#1affe0" stroke-width=".7"  fill="none" opacity=".14"/>
+      </svg>
+    </div>
+
+    <canvas id="confetti-canvas" width="1920" height="1080"></canvas>
+
+    <div class="ball-wrap">
+      <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bg" cx="36%" cy="30%" r="65%">
+            <stop offset="0%"   stop-color="#ffffff"/>
+            <stop offset="30%"  stop-color="#e8e8e8"/>
+            <stop offset="70%"  stop-color="#b0b0b0"/>
+            <stop offset="100%" stop-color="#606060"/>
+          </radialGradient>
+          <radialGradient id="pg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#1a1a2e"/>
+            <stop offset="100%" stop-color="#0a0a14"/>
+          </radialGradient>
+          <radialGradient id="sh" cx="28%" cy="22%" r="40%">
+            <stop offset="0%"   stop-color="rgba(255,255,255,.95)"/>
+            <stop offset="60%"  stop-color="rgba(255,255,255,.25)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+          <radialGradient id="shadow" cx="50%" cy="50%">
+            <stop offset="0%"   stop-color="rgba(0,0,0,.55)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+          </radialGradient>
+          <clipPath id="bc"><circle cx="110" cy="110" r="100"/></clipPath>
+        </defs>
+        <ellipse cx="110" cy="215" rx="72" ry="10" fill="url(#shadow)" opacity=".5"/>
+        <circle cx="110" cy="110" r="100" fill="url(#bg)" filter="drop-shadow(0 8px 28px rgba(0,0,0,.7))"/>
+        <g clip-path="url(#bc)">
+          <polygon points="110,18 136,36 126,66 94,66 84,36"           fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="136,36 168,52 162,86 126,66"                fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="168,52 194,80 188,116 162,86"               fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="188,116 178,150 148,160 138,126 162,86"     fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="84,36 94,66 58,86 52,52"                    fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="52,52 58,86 32,116 26,80"                   fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="32,116 58,86 82,126 72,160 42,150"          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".92"/>
+          <polygon points="94,66 126,66 138,96 110,108 82,96"          fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="126,66 162,86 162,116 138,126 138,96"       fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="94,66 82,96 82,126 58,116 58,86"            fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="82,126 110,108 138,126 128,158 92,158"      fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="92,158 128,158 138,188 110,200 82,188"      fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="128,158 148,160 178,180 148,202 138,188"    fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+          <polygon points="92,158 82,188 72,200 42,180 72,160"         fill="url(#pg)" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" opacity=".88"/>
+        </g>
+        <ellipse cx="82" cy="72" rx="28" ry="18" fill="url(#sh)" opacity=".7" transform="rotate(-25,82,72)"/>
+        <ellipse cx="68" cy="60" rx="10" ry="6"  fill="rgba(255,255,255,.5)" transform="rotate(-25,68,60)"/>
+      </svg>
+    </div>
+
+    <div class="content">
+      <div class="tournament-title">
+        <span class="hall-name">Dr. QK Hall</span>
+        <span class="sub-title">Intra-Hall Futsal · Tournament-2026</span>
+      </div>
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-diamond"></div>
+        <div class="divider-line"></div>
+      </div>
+      <span class="auction-word">AUCTION</span>
+      <div class="divider" style="margin-top:14px">
+        <div class="divider-line"></div>
+        <div class="divider-diamond"></div>
+        <div class="divider-line"></div>
+      </div>
+      <div class="time-line">TODAY AT 11:00 PM</div>
+
+      <!-- JOIN US Button -->
+      <div class="join-btn-wrap">
+        <a class="join-btn" href="https://forms.gle/X6vfXEbXRk4Ch6Hd7" target="_blank" rel="noopener noreferrer">
+          JOIN US
+        </a>
+      </div>
+    </div>
+
+    <!-- Music toggle -->
+    <button class="music-btn" id="musicBtn" title="Toggle music" aria-label="Toggle background music">
+      <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18V5l12-2v13"/>
+        <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Background music -->
+<audio id="bgMusic" loop>
+  <source src="assets/music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  // ── Responsive scaling: fits PC, phone, tablet, TV ──────────────────
+  function scaleToFit() {
+    var el     = document.getElementById('scaleRoot');
+    var scaleX = window.innerWidth  / 1920;
+    var scaleY = window.innerHeight / 1080;
+    // Use the smaller axis so it always fits — no crop on any device
+    var scale  = Math.min(scaleX, scaleY);
+    el.style.transform = 'scale(' + scale + ')';
+    el.style.left = ((window.innerWidth  - 1920 * scale) / 2) + 'px';
+    el.style.top  = ((window.innerHeight - 1080 * scale) / 2) + 'px';
+  }
+  scaleToFit();
+  window.addEventListener('resize', scaleToFit);
+  // Also handle mobile orientation change
+  window.addEventListener('orientationchange', function() {
+    setTimeout(scaleToFit, 120);
+  });
+
+  // ── Music: autoplay attempt + click/touch fallback ───────────────────
+  var music   = document.getElementById('bgMusic');
+  var btn     = document.getElementById('musicBtn');
+  var icon    = document.getElementById('musicIcon');
+  var playing = false;
+
+  var iconPlaying = '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>';
+  var iconMuted   = '<line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/><path d="M9 18V5l12-2v13" opacity=".35"/>';
+
+  function startMusic() {
+    music.volume = 0.6;
+    music.play().then(function() {
+      playing = true;
+    }).catch(function() {
+      playing = false;
+    });
+  }
+
+  function updateIcon() {
+    icon.innerHTML = playing ? iconPlaying : iconMuted;
+  }
+
+  // Try autoplay immediately
+  startMusic();
+
+  // Fallback: first interaction anywhere
+  function firstInteraction() {
+    if (!playing) startMusic();
+    document.removeEventListener('click',      firstInteraction);
+    document.removeEventListener('touchstart', firstInteraction);
+    document.removeEventListener('keydown',    firstInteraction);
+  }
+  document.addEventListener('click',      firstInteraction);
+  document.addEventListener('touchstart', firstInteraction, { passive: true });
+  document.addEventListener('keydown',    firstInteraction);
+
+  // Toggle button
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (playing) {
+      music.pause();
+      playing = false;
+    } else {
+      music.volume = 0.6;
+      music.play().then(function() { playing = true; updateIcon(); });
+    }
+    updateIcon();
+  });
+
+  // Update icon when play/pause events fire
+  music.addEventListener('play',  function() { playing = true;  updateIcon(); });
+  music.addEventListener('pause', function() { playing = false; updateIcon(); });
+
+  // ── Canvas confetti ──────────────────────────────────────────────────
+  var canvas = document.getElementById('confetti-canvas');
+  var ctx    = canvas.getContext('2d');
+  var W = 1920, H = 1080;
+
+  var COLORS = ['#f5c518','#ffffff','#1affe0','#ffd700','#c0c0c0','#ff6b6b','#4ecdc4','#ffe066'];
+
+  var pieces = [];
+  for (var i = 0; i < 80; i++) {
+    pieces.push({
+      x:      Math.random() * W,
+      y:      Math.random() * H - H,
+      w:      8  + Math.random() * 12,
+      h:      12 + Math.random() * 16,
+      color:  COLORS[Math.floor(Math.random() * COLORS.length)],
+      speed:  1.2 + Math.random() * 2.8,
+      angle:  Math.random() * Math.PI * 2,
+      spin:   (Math.random() - 0.5) * 0.12,
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: 0.04 + Math.random() * 0.04,
+      isCircle: Math.random() > 0.55
+    });
+  }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < pieces.length; i++) {
+      var p = pieces[i];
+      p.y      += p.speed;
+      p.angle  += p.spin;
+      p.wobble += p.wobbleSpeed;
+      p.x      += Math.sin(p.wobble) * 1.2;
+      if (p.y > H + 20) { p.x = Math.random() * W; p.y = -20; }
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.globalAlpha = 0.88;
+      ctx.fillStyle = p.color;
+      if (p.isCircle) {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.w / 2, p.h / 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      }
+      ctx.restore();
+    }
+    requestAnimationFrame(drawFrame);
+  }
+  drawFrame();
+</script>
+</body>
+</html>
